@@ -1,0 +1,4 @@
+Dataset: Brazilian E-Commerce Public Dataset (Olist)
+
+Download:
+https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
