@@ -1,0 +1,36 @@
+-- Total Revenue
+SELECT SUM(total_payment) AS total_revenue
+FROM final_dataset;
+
+-- Monthly Revenue
+SELECT DATE_TRUNC('month', order_date) AS month,
+SUM(total_payment) AS revenue
+FROM final_dataset
+GROUP BY month
+ORDER BY month;
+
+-- Top Categories
+SELECT product_category, COUNT(*) AS total_orders
+FROM final_dataset
+GROUP BY product_category
+ORDER BY total_orders DESC
+LIMIT 10;
+
+-- Average Order Value
+SELECT AVG(total_payment) FROM final_dataset;
+
+-- Top Cities by Revenue
+SELECT customer_city, SUM(total_payment) AS revenue
+FROM final_dataset
+GROUP BY customer_city
+ORDER BY revenue DESC
+LIMIT 10;
+
+-- Avg Delivery Time
+SELECT AVG(delivery_days) FROM final_dataset;
+
+-- Review Distribution
+SELECT review_score, COUNT(*)
+FROM final_dataset
+GROUP BY review_score
+ORDER BY review_score;

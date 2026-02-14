@@ -1,0 +1,60 @@
+-- =========================
+-- CUSTOMERS CLEANING
+-- =========================
+ALTER TABLE olist_customers_dataset ADD COLUMN customer_city_clean TEXT;
+ALTER TABLE olist_customers_dataset ADD COLUMN customer_state_clean TEXT;
+
+UPDATE olist_customers_dataset
+SET customer_city_clean = LOWER(TRIM(customer_city));
+
+UPDATE olist_customers_dataset
+SET customer_state_clean = UPPER(TRIM(customer_state));
+
+-- =========================
+-- ORDERS FEATURE ENGINEERING
+-- =========================
+ALTER TABLE olist_orders_dataset ADD COLUMN delivery_days INT;
+
+UPDATE olist_orders_dataset
+SET delivery_days = DATE_PART('day',
+order_delivered_customer_date - order_purchase_timestamp);
+
+-- =========================
+-- ORDER ITEMS FEATURES
+-- =========================
+ALTER TABLE olist_order_items_dataset ADD COLUMN total_item_cost NUMERIC;
+
+UPDATE olist_order_items_dataset
+SET total_item_cost = price + freight_value;
+
+-- =========================
+-- PAYMENTS SUMMARY TABLE
+-- =========================
+CREATE TABLE payments_summary AS
+SELECT order_id,
+SUM(payment_value) AS total_payment
+FROM olist_order_payments_dataset
+GROUP BY order_id;
+
+-- =========================
+-- PRODUCTS CATEGORY TRANSLATION
+-- =========================
+ALTER TABLE olist_products_dataset ADD COLUMN category_english TEXT;
+
+UPDATE olist_products_dataset p
+SET category_english = t.product_category_name_english
+FROM product_category_name_translation t
+WHERE p.product_category_name = t.product_category_name;
+
+-- =========================
+-- GEOLOCATION CLEAN TABLE
+-- =========================
+CREATE TABLE geolocation_clean AS
+SELECT
+geolocation_zip_code_prefix AS zip_code,
+AVG(geolocation_lat) AS avg_lat,
+AVG(geolocation_lng) AS avg_lng,
+MIN(geolocation_city) AS city,
+MIN(geolocation_state) AS state
+FROM olist_geolocation_dataset
+GROUP BY geolocation_zip_code_prefix;
